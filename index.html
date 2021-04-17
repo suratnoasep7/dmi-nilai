@@ -1,0 +1,60 @@
+<html>
+    <head>
+        <title>Nilai Tukar Mata Asing Ke Nilai Rupiah</title>
+        <link rel="stylesheet" href="css/bootstrap.css">
+        <link rel="stylesheet" href="css/style.css">
+        <script type="text/javascript" src="js/bootstrap.js"></script>
+        <script type="text/javascript" src="js/jquery.js"></script>
+        <script type="text/javascript">
+            function formatRupiah(angka, prefix){
+                var number_string = angka.toString(),
+                    split   		= number_string.split(','),
+                    sisa     		= split[0].length % 3,
+                    rupiah     		= split[0].substr(0, sisa),
+                    ribuan     		= split[0].substr(sisa).match(/\d{3}/gi);
+                if(ribuan){
+                    separator = sisa ? '.' : '';
+                    rupiah += separator + ribuan.join('.');
+                }
+                rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+                return prefix == undefined ? rupiah : (rupiah ? 'Rp. ' + rupiah : '');
+            }
+            $(document).ready(function() {
+                $('#btn-submit-nilai').click(function() {
+                    var jenisMataUang = $('#jenisMataUang').val();
+                    var nilai = $('#nilai').val();
+                    if(jenisMataUang != "" && nilai != "") {
+                        $.getJSON('https://api.frankfurter.app/latest?amount='+nilai+'&from='+jenisMataUang+'&to=IDR', function(data) {
+                            $('#hasil').val(formatRupiah(data.rates.IDR, 'Rp. '));
+                        });
+                    }
+                });
+            });
+            /**/
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card content-nilai" style="width: 18rem;">
+                        <div class="card-body">
+                            <form>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="jenisMataUang" placeholder="Jenis Mata Uang" oninput="this.value = this.value.toUpperCase()">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="nilai" placeholder="Nilai">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" class="form-control" id="hasil" placeholder="Hasil">
+                                </div>
+                                <button type="button" class="btn btn-primary" id="btn-submit-nilai">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
